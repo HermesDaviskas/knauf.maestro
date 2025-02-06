@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knauf-maestro-auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: knauf-maestro-auth
+  template:
+    metadata:
+      labels:
+        app: knauf-maestro-auth
+    spec:
+      containers:
+        - name: knauf-maestro-auth-pod
+          image: hermesdaviskas/knauf.maestro_auth
+          ports:
+            - containerPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knauf-maestro-auth-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: knauf-maestro-auth
+  ports:
+    - name: knauf-maestro-auth-clusterip-port
+      protocol: TCP
+      port: 3001
+      targetPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knauf-maestro-auth-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: knauf-maestro-auth
+  ports:
+    - name: knauf-maestro-auth-nodeport-port
+      protocol: TCP
+      port: 3001
+      targetPort: 3001
+      nodePort: 30001

@@ -1,0 +1,14 @@
+node_modules/
+
+*.log
+*.env
+*.git/
+
+build/
+dist/
+
+tests/
+*.test.js
+
+.vscode/
+.idea/

@@ -1,0 +1,32 @@
+{
+  "name": "knauf.maestro_auth",
+  "version": "1.0.0",
+  "description": "User authentication micro-srv to be used with Knauf Maestro Application.",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node-dev src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hermesdaviskas/knauf.maestro.git"
+  },
+  "author": "Hermes A. Daviskas email: hermes.daviskas@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hermesdaviskas/knauf.maestro/issues"
+  },
+  "homepage": "https://github.com/hermesdaviskas/knauf.maestro_auth#readme",
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.13.1"
+  }
+}
