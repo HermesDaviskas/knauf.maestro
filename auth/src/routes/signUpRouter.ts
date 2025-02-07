@@ -12,30 +12,28 @@
 import * as express from "express";
 import { Request, Response, NextFunction } from "express";
 
-import { signUpValidator } from "../controllers/validators";
-import { validationResult } from "express-validator";
-import { RequestValidationError } from "../../../errorHandler/models";
+import { signUpValidator, validationCheck } from "../middlewares/validators";
+import { successResponseParam } from "../../interfaces/successResponseParam";
 
 const router = express.Router();
 
 router.post(
   "/api/users/signup",
   signUpValidator,
-  validationCheck,
+  validationCheck("auth", "signUpRouter", "Creating new user"),
   (req: Request, res: Response) => {
-    res.send("auth micro-srv signup");
+    const response: successResponseParam = {
+      success: true,
+      inOperation: "Creating new user",
+      data: [
+        {
+          username: req.body.username,
+          password: req.body.password,
+        },
+      ],
+    };
+    res.send(response);
   }
 );
-
-function validationCheck(req: Request, res: Response, next: NextFunction) {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty())
-    throw new RequestValidationError({
-      inService: "auth",
-      inFunction: "signUpRouter",
-      operationFailed: "User sign up failed",
-    });
-  next();
-}
 
 export { router as signUpRouter };

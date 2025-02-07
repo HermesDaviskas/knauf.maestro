@@ -1,8 +1,9 @@
 export interface ErrorResponseParam {
   success: boolean;
   errorCode: number;
-  error: string;
-  inService: string;
-  inFunction: string;
-  operationFailed: string;
+  errorClass: string;
+  errorTriggers: any[] | null;
+  inService: string | null;
+  inFunction: string | null;
+  inOperation: string | null;
 }

@@ -1,32 +1,26 @@
 import { ErrorConstructorParam, ErrorResponseParam } from "../interfaces";
 
 export class RequestValidationError extends Error {
-  public readonly success: boolean = false;
   public readonly errorCode: number = 400;
-  public readonly error: string = "RequestValidationError";
-  public readonly inService: string;
-  public readonly inFunction: string;
-  public readonly operationFailed: string;
+  private readonly formattedError: ErrorResponseParam;
 
-  constructor({
-    inService,
-    inFunction,
-    operationFailed,
-  }: ErrorConstructorParam) {
-    super(operationFailed);
-    this.inService = inService;
-    this.inFunction = inFunction;
-    this.operationFailed = operationFailed;
+  constructor(errorSource: ErrorConstructorParam) {
+    super("RequestValidationError");
+
+    Object.setPrototypeOf(this, RequestValidationError.prototype);
+
+    this.formattedError = {
+      success: false,
+      errorCode: this.errorCode,
+      errorClass: "RequestValidationError",
+      errorTriggers: errorSource.errorTriggers,
+      inService: errorSource.inService,
+      inFunction: errorSource.inFunction,
+      inOperation: errorSource.inOperation,
+    };
   }
 
-  toJSON(): ErrorResponseParam {
-    return {
-      success: this.success,
-      errorCode: this.errorCode,
-      error: this.error,
-      inService: this.inService,
-      inFunction: this.inFunction,
-      operationFailed: this.operationFailed,
-    };
+  toJSON() {
+    return this.formattedError;
   }
 }

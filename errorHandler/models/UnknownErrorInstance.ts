@@ -1,32 +1,26 @@
 import { ErrorConstructorParam, ErrorResponseParam } from "../interfaces";
 
 export class UnknownErrorInstance extends Error {
-  public readonly success: boolean = false;
   public readonly errorCode: number = 500;
-  public readonly error: string = "UnknownErrorInstance";
-  public readonly inService: string;
-  public readonly inFunction: string;
-  public readonly operationFailed: string;
+  private readonly formattedError: ErrorResponseParam;
 
-  constructor({
-    inService,
-    inFunction,
-    operationFailed,
-  }: ErrorConstructorParam) {
+  constructor(errorSource: ErrorConstructorParam) {
     super("UnknownErrorInstance");
-    this.inService = inService;
-    this.inFunction = inFunction;
-    this.operationFailed = operationFailed;
+
+    Object.setPrototypeOf(this, UnknownErrorInstance.prototype);
+
+    this.formattedError = {
+      success: false,
+      errorCode: this.errorCode,
+      errorClass: "UnknownErrorInstance",
+      errorTriggers: errorSource.errorTriggers,
+      inService: errorSource.inService,
+      inFunction: errorSource.inFunction,
+      inOperation: errorSource.inOperation,
+    };
   }
 
-  toJSON(): ErrorResponseParam {
-    return {
-      success: this.success,
-      errorCode: this.errorCode,
-      error: this.error,
-      inService: this.inService,
-      inFunction: this.inFunction,
-      operationFailed: this.operationFailed,
-    };
+  toJSON() {
+    return this.formattedError;
   }
 }

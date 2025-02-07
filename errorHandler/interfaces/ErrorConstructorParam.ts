@@ -1,5 +1,6 @@
 export interface ErrorConstructorParam {
-  inService: string;
-  inFunction: string;
-  operationFailed: string;
+  errorTriggers: any[] | null;
+  inService: string | null;
+  inFunction: string | null;
+  inOperation: string | null;
 }

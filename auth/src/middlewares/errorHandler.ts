@@ -16,9 +16,10 @@ export const errorHandler = (
   } else {
     console.log("Handling unknown error");
     const unknownErrorInstance = new UnknownErrorInstance({
-      inService: "unreferenced",
-      inFunction: "unreferenced",
-      operationFailed: err.message,
+      errorTriggers: [err.message],
+      inService: null,
+      inFunction: null,
+      inOperation: null,
     });
     res.status(unknownErrorInstance.errorCode).send(unknownErrorInstance);
   }
