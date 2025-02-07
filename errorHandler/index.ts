@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { RequestValidationError } from "./models/request-validation-error";
+import { RequestValidationError, UnknownErrorInstance } from "./models";
 
 export const errorHandler = (
   err: Error,
@@ -12,6 +12,11 @@ export const errorHandler = (
     res.status(err.errorCode).send(err);
   } else {
     console.log("Handling unknown error");
-    res.status(300).send(err);
+    const unknownErrorInstance = new UnknownErrorInstance({
+      inService: "unreferenced",
+      inFunction: "unreferenced",
+      operationFailed: err.message,
+    });
+    res.status(unknownErrorInstance.errorCode).send(unknownErrorInstance);
   }
 };

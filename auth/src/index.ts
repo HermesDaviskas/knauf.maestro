@@ -2,18 +2,23 @@ import express from "express";
 import cors from "cors";
 import { json } from "body-parser";
 
-import * as routes from "./routes/_index";
+import {
+  currentUserRouter,
+  signInRouter,
+  signUpRouter,
+  signOutRouter,
+} from "./routes";
 
-import { errorHandler } from "../../errors/src/errorHandler";
+import { errorHandler } from "../../errorHandler";
 
 const app = express();
 app.use(cors());
 app.use(json());
 
-app.use(routes.currentUserRouter);
-app.use(routes.signInRouter);
-app.use(routes.signUpRouter);
-app.use(routes.signOutRouter);
+app.use(currentUserRouter);
+app.use(signInRouter);
+app.use(signUpRouter);
+app.use(signOutRouter);
 
 app.use(errorHandler);
 

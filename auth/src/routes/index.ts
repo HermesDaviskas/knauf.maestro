@@ -20,10 +20,10 @@
  */
 
 // Importing the individual route modules
-import { currentUserRouter } from "./current-user";
-import { signInRouter } from "./sign-in";
-import { signUpRouter } from "./sign-up";
-import { signOutRouter } from "./sign-out";
+import { currentUserRouter } from "./currentUserRouter";
+import { signInRouter } from "./signInRouter";
+import { signUpRouter } from "./signUpRouter";
+import { signOutRouter } from "./signOutRouter";
 
 // Re-exporting the modules for easy access from a single point.
 export { currentUserRouter, signInRouter, signUpRouter, signOutRouter };
