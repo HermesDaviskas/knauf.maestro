@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { RequestValidationError, UnknownErrorInstance } from "./models";
+import {
+  RequestValidationError,
+  UnknownErrorInstance,
+} from "../../../errorHandler/models";
 
 export const errorHandler = (
   err: Error,

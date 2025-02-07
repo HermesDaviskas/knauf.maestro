@@ -9,7 +9,7 @@ import {
   signOutRouter,
 } from "./routes";
 
-import { errorHandler } from "../../errorHandler";
+import { errorHandler } from "./controllers/errorHandler";
 
 const app = express();
 app.use(cors());
