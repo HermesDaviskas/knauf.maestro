@@ -2,11 +2,15 @@ import { Request, Response } from "express";
 import { CustomResponse, CustomResponseJSON } from "./CustomResponse";
 
 export class UserCreatedResponse extends CustomResponse {
-  public statusCode = 201;
-  private inOperation = "Creating new user";
+  public statusCode: number;
+  private inOperation: string;
+  private data: any;
 
   constructor(private req: Request, private res: Response) {
     super();
+    this.statusCode = 201;
+    this.inOperation = "Creating new user";
+    this.data = Array.isArray(req.body) ? req.body : [req.body];
   }
 
   toJSON(): CustomResponseJSON {
@@ -14,7 +18,7 @@ export class UserCreatedResponse extends CustomResponse {
       success: true,
       statusCode: this.statusCode,
       inOperation: this.inOperation,
-      data: Array.isArray(this.req.body) ? this.req.body : [this.req.body],
+      data: this.data,
     };
   }
 

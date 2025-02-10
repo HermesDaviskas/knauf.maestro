@@ -10,12 +10,12 @@ export class GenericResponse extends CustomResponse {
   constructor(
     private req: Request,
     private res: Response,
-    customResponseArgs: CustomResponseArgs
+    cra: CustomResponseArgs
   ) {
     super();
-    this.statusCode = customResponseArgs.statusCode;
-    this.inOperation = customResponseArgs.inOperation;
-    this.data = customResponseArgs.data;
+    this.statusCode = cra.statusCode;
+    this.inOperation = cra.inOperation;
+    this.data = Array.isArray(cra.data) ? cra.data : [cra.data];
   }
 
   toJSON(): CustomResponseJSON {
