@@ -4,7 +4,7 @@ import { CustomResponse, CustomResponseJSON } from "./CustomResponse";
 export class UserCreatedResponse extends CustomResponse {
   public statusCode: number;
   private inOperation: string;
-  private data: any;
+  private data: any[];
 
   constructor(private req: Request, private res: Response) {
     super();

@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
+import "express-async-errors";
 import { json } from "body-parser";
+import { NotFoundError } from "./errors/NotFoundError";
 
 import {
   currentUserRouter,
@@ -19,6 +21,14 @@ app.use(currentUserRouter);
 app.use(signInRouter);
 app.use(signUpRouter);
 app.use(signOutRouter);
+
+app.all("*", async (req, res) => {
+  throw new NotFoundError({
+    errorTriggers: [{ msg: "The requested resource was not found." }],
+    inService: "auth",
+    inFunction: "routing",
+  });
+});
 
 app.use(errorHandler);
 

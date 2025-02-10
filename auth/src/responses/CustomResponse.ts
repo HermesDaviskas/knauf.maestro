@@ -6,7 +6,10 @@ export { CustomResponseArgs, CustomResponseJSON };
 export abstract class CustomResponse {
   abstract statusCode: number;
 
-  constructor() {}
+  constructor() {
+    //
+    //
+  }
 
   // Method to transform the response into JSON format
   abstract toJSON(): CustomResponseJSON;

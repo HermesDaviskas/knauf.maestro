@@ -5,7 +5,7 @@ import { CustomResponseArgs } from "./CustomResponseArgs";
 export class GenericResponse extends CustomResponse {
   public statusCode: number;
   private inOperation: string;
-  private data: any;
+  private data: any[];
 
   constructor(
     private req: Request,
