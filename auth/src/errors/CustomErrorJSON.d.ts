@@ -1,8 +1,13 @@
-export interface ErrorResponseParam {
+export interface ErrorTrigger {
+  msg: string;
+  [key: string]: any;
+}
+
+export interface CustomErrorJSON {
   success: boolean;
   errorCode: number;
   errorClass: string;
-  errorTriggers: any[] | null;
+  errorTriggers: ErrorTrigger[];
   inService: string | null;
   inFunction: string | null;
   inOperation: string | null;

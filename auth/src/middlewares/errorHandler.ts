@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  RequestValidationError,
-  UnknownErrorInstance,
-} from "../../../errorHandler/models";
+import { CustomError } from "../errors/CustomError";
+import { CustomErrorJSON } from "../errors/CustomErrorJSON";
+import { UknownInstanceError } from "../errors/UknownInstanceError";
 
 export const errorHandler = (
   err: Error,
@@ -10,17 +9,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof RequestValidationError) {
-    console.log("Handling request validation error");
-    res.status(err.errorCode).send(err);
+  if (err instanceof CustomError) {
+    res.status(err.errorCode).send(err.toJSON());
   } else {
-    console.log("Handling unknown error");
-    const unknownErrorInstance = new UnknownErrorInstance({
-      errorTriggers: [err.message],
-      inService: null,
-      inFunction: null,
-      inOperation: null,
+    const uknownInstanceError = new UknownInstanceError({
+      errorTriggers: [{ msg: err }],
     });
-    res.status(unknownErrorInstance.errorCode).send(unknownErrorInstance);
+    res.status(uknownInstanceError.errorCode).send(uknownInstanceError);
   }
 };

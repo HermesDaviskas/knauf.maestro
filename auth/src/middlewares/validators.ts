@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
-import { RequestValidationError } from "../../../errorHandler/models";
+import { RequestValidationError } from "../errors/RequestValidationError";
 
 /**
  * Validator for sign-up data.
