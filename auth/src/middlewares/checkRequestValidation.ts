@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
-import { RequestValidationError } from "../errors/RequestValidationError";
+import { body, validationResult, ValidationChain } from "express-validator";
+import { RequestValidationError } from "../errors";
 
 /**
  * Validator for sign-up data.
  * Ensures the username is at least 5 characters long and the password is at least 6 characters.
  */
-export const signUpValidator = [
+export const signUp: ValidationChain[] = [
   body("username")
     .trim()
     .isLength({ min: 5 })
@@ -18,17 +18,27 @@ export const signUpValidator = [
 ];
 
 /**
- * Custom validation error handler that sends a structured response.
+ * Validator for sign-in data.
+ * Ensures username and password are provided.
  */
-export function checkRequestValidation(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const validationErrors = validationResult(req);
+export const signIn: ValidationChain[] = [
+  body("username").trim().notEmpty().withMessage("Username not provided"),
+  body("password").trim().notEmpty().withMessage("Password not provided"),
+];
 
-  if (!validationErrors.isEmpty())
-    throw new RequestValidationError(validationErrors.array());
+/**
+ * Middleware to validate request based on provided validator.
+ */
+export const validateRequest = (validator: ValidationChain[]) => {
+  return [
+    ...validator,
+    (req: Request, res: Response, next: NextFunction) => {
+      const validationErrors = validationResult(req);
 
-  next();
-}
+      if (!validationErrors.isEmpty())
+        throw new RequestValidationError(validationErrors.array());
+
+      next();
+    },
+  ];
+};

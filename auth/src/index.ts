@@ -11,8 +11,8 @@ import {
   signOutRouter,
 } from "./routes";
 
-import { NotFoundError } from "./errors/NotFoundError";
-import { errorHandler } from "./middlewares/errorHandler";
+import { NotFoundError } from "./errors";
+import { errorHandler } from "./middlewares";
 
 const app = express();
 app.use(cors());
@@ -34,7 +34,7 @@ const connectToDB = async () => {
     await mongoose.connect("mongodb://auth-mongo-clusterip-srv:3011/auth");
     console.log("connected to auth db");
   } catch (err) {
-    console.log(err);
+    throw new Error("cannot connect to DB");
   }
 };
 

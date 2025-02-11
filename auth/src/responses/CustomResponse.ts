@@ -1,19 +1,21 @@
-import { CustomResponseArgs } from "./CustomResponseArgs";
-import { CustomResponseJSON } from "./CustomResponseJSON";
+export type Status = [statusCode: number, statusDesc: string];
 
-export { CustomResponseArgs, CustomResponseJSON };
+export type Message = { msg: string; data: any };
+
+export interface CustomResponseJSON {
+  success: boolean;
+  status: Status;
+  messages: Message[];
+}
 
 export abstract class CustomResponse {
-  abstract statusCode: number;
+  abstract status: Status;
 
-  constructor() {
-    //
-    //
-  }
+  constructor(public message: string) {}
 
   // Method to transform the response into JSON format
   abstract toJSON(): CustomResponseJSON;
 
   // Abstract method to be implemented by extending classes to send the response
-  abstract sendResponse(): void; // Removed (req: Request, res: Response)
+  abstract sendResponse(): void;
 }

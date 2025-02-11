@@ -4,18 +4,15 @@ import mongoose from "mongoose";
 interface UserDoc extends mongoose.Document {
   username: string;
   password: string;
-  // Args automatically created by mongooseDB:
-  // createdAt: string; // uncomment if needed
-  // updatedAt: string; // uncomment if needed
-}
-
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(userModelArgs: UserBuildArgs): UserDoc;
 }
 
 interface UserBuildArgs {
   username: string;
   password: string;
+}
+
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(userModelArgs: UserBuildArgs): UserDoc;
 }
 
 const userSchema = new mongoose.Schema({
@@ -34,9 +31,4 @@ userSchema.statics.build = (userBuildArgs: UserBuildArgs) => {
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 
-const user = User.build({
-  username: "ermis",
-  password: "12345678",
-});
-
-export { User };
+export { User, UserDoc };

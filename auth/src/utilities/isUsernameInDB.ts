@@ -6,13 +6,11 @@ import { User } from "../models/User";
  * @returns A Promise resolving to `true` if the user exists, otherwise `false`.
  */
 
-export async function checkUserExistence(username: string): Promise<boolean> {
+export async function isUsernameInDB(username: string): Promise<boolean> {
   try {
     const result = Boolean(await User.exists({ username }));
     return result;
   } catch (err) {
-    throw new Error(
-      `error in function checkUserExistence(${username}). ${err}`
-    );
+    throw new Error(`error in function isUsernameInDB(${username}). ${err}`);
   }
 }

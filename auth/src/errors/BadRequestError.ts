@@ -1,11 +1,11 @@
 import { CustomError, Status, CustomErrorJSON } from "./CustomError";
 
-export class NotFoundError extends CustomError {
-  public status: Status = [404, "NotFoundError"];
+export class BadRequestError extends CustomError {
+  public status: Status = [404, "BadRequestError"];
 
   constructor(public message: string) {
     super(message);
-    Object.setPrototypeOf(this, NotFoundError.prototype);
+    Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 
   toJSON(): CustomErrorJSON {

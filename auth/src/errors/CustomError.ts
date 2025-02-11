@@ -1,13 +1,20 @@
-import { CustomErrorArgs } from "./CustomErrorArgs";
-import { CustomErrorJSON } from "./CustomErrorJSON";
+import { ValidationError } from "express-validator";
 
-export { CustomErrorArgs, CustomErrorJSON };
+export type Status = [statusCode: number, statusDesc: string];
+
+export type Message = { msg: string };
+
+export interface CustomErrorJSON {
+  success: boolean;
+  status: Status;
+  messages: Message[] | ValidationError[]; // List of reasons for the error
+}
 
 export abstract class CustomError extends Error {
-  abstract errorCode: number;
+  abstract status: Status;
 
-  constructor() {
-    super();
+  constructor(public message: string) {
+    super(message);
     Object.setPrototypeOf(this, CustomError.prototype);
   }
 

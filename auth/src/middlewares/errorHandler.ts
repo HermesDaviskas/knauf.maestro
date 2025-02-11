@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CustomError } from "../errors/CustomError";
-import { UnknownInstanceError } from "../errors/UnknownInstanceError";
+import { CustomError, InternalServerError } from "../errors";
 
 export const errorHandler = (
   err: Error,
@@ -10,10 +9,12 @@ export const errorHandler = (
 ) => {
   if (err instanceof CustomError) {
     console.log(err.toJSON());
-    res.status(err.errorCode).send(err.toJSON());
+    res.status(err.status[0]).send(err.toJSON());
   } else {
-    const unknownInstError = new UnknownInstanceError(err.message);
-    console.log(unknownInstError.toJSON());
-    res.status(unknownInstError.errorCode).send(unknownInstError.toJSON());
+    const internalServerError = new InternalServerError(err.message);
+    console.log(internalServerError.toJSON());
+    res
+      .status(internalServerError.status[0])
+      .send(internalServerError.toJSON());
   }
 };

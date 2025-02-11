@@ -1,26 +1,30 @@
 import { Router, Request, Response } from "express";
-import { signUpValidator } from "../middlewares/checkRequestValidation";
-import { UserCreatedResponse } from "../responses/UserCreatedResponse";
 
-//import { checkRequestValidness } from "../utilities/checkRequestValidness";
-import { checkRequestValidation } from "../middlewares/checkRequestValidation";
-import { checkUserExistence } from "../utilities/checkUserExistence";
+import { validateRequest, signUp } from "../middlewares/";
+import { checkUserAvailability } from "../middlewares/";
 
-import { NotFoundError } from "../errors/NotFoundError";
-import { UserAlreadyExistsError } from "../errors/UserAlreadyExistsError";
+import { User } from "../models/User";
+import { CreatedResponse } from "../responses";
 
 const router = Router();
 
 router.post(
   "/api/users/signup",
-  signUpValidator,
-  checkRequestValidation,
-  async (req: Request, res: Response) => {
-    if (await checkUserExistence(req.body.username)) {
-      throw new UserAlreadyExistsError();
-    }
+  validateRequest(signUp),
+  checkUserAvailability(),
 
-    new UserCreatedResponse(req, res).sendResponse();
+  async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body;
+      const user = User.build({ username, password });
+      await user.save();
+      const response = new CreatedResponse("user created", user, res);
+      await response.sendResponse();
+
+      new CreatedResponse("user created", user, res).sendResponse();
+    } catch (err) {
+      throw new Error(`error while recording user in DB. ${err}`);
+    }
   }
 );
 
