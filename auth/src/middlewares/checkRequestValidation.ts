@@ -20,21 +20,15 @@ export const signUpValidator = [
 /**
  * Custom validation error handler that sends a structured response.
  */
-export function validationCheck(
-  inService: string,
-  inFunction: string,
-  inOperation: string
+export function checkRequestValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
-  return function (req: Request, res: Response, next: NextFunction) {
-    const validationErrors = validationResult(req);
-    if (!validationErrors.isEmpty()) {
-      throw new RequestValidationError({
-        errorTriggers: validationErrors.array(),
-        inService,
-        inFunction,
-        inOperation,
-      });
-    }
-    next();
-  };
+  const validationErrors = validationResult(req);
+
+  if (!validationErrors.isEmpty())
+    throw new RequestValidationError(validationErrors.array());
+
+  next();
 }

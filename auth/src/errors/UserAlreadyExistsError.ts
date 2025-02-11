@@ -1,21 +1,21 @@
 import { CustomError, CustomErrorJSON } from "./CustomError";
 
-export class NotFoundError extends CustomError {
-  errorCode = 404;
+export class UserAlreadyExistsError extends CustomError {
+  errorCode = 400;
 
   constructor(public errorTriggers?: string) {
     super();
-    Object.setPrototypeOf(this, NotFoundError.prototype);
+    Object.setPrototypeOf(this, UserAlreadyExistsError.prototype);
   }
 
   toJSON(): CustomErrorJSON {
     return {
       success: false,
       errorCode: this.errorCode,
-      errorClass: "NotFoundError",
+      errorClass: "UserAlreadyExistsError",
       errorTriggers: this.errorTriggers
         ? [{ msg: this.errorTriggers }]
-        : [{ msg: "Resource not found" }], // Fallback message
+        : [{ msg: "User already exists" }], // Default message
       inService: "auth",
       // Optional fields:
       // inFunction: this.customErrorArgs?.inFunction ?? null,

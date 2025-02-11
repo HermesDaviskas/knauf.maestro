@@ -1,21 +1,21 @@
 import { CustomError, CustomErrorJSON } from "./CustomError";
 
-export class NotFoundError extends CustomError {
-  errorCode = 404;
+export class UnknownInstanceError extends CustomError {
+  errorCode = 500;
 
   constructor(public errorTriggers?: string) {
     super();
-    Object.setPrototypeOf(this, NotFoundError.prototype);
+    Object.setPrototypeOf(this, UnknownInstanceError.prototype);
   }
 
   toJSON(): CustomErrorJSON {
     return {
       success: false,
       errorCode: this.errorCode,
-      errorClass: "NotFoundError",
+      errorClass: "UnknownInstanceError",
       errorTriggers: this.errorTriggers
         ? [{ msg: this.errorTriggers }]
-        : [{ msg: "Resource not found" }], // Fallback message
+        : [{ msg: "An unknown instance error occurred" }],
       inService: "auth",
       // Optional fields:
       // inFunction: this.customErrorArgs?.inFunction ?? null,

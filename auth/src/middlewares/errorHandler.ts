@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { CustomError } from "../errors/CustomError";
-import { CustomErrorJSON } from "../errors/CustomErrorJSON";
-import { UknownInstanceError } from "../errors/UknownInstanceError";
+import { UnknownInstanceError } from "../errors/UnknownInstanceError";
 
 export const errorHandler = (
   err: Error,
@@ -10,11 +9,11 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof CustomError) {
+    console.log(err.toJSON());
     res.status(err.errorCode).send(err.toJSON());
   } else {
-    const uknownInstanceError = new UknownInstanceError({
-      errorTriggers: [{ msg: err }],
-    });
-    res.status(uknownInstanceError.errorCode).send(uknownInstanceError);
+    const unknownInstError = new UnknownInstanceError(err.message);
+    console.log(unknownInstError.toJSON());
+    res.status(unknownInstError.errorCode).send(unknownInstError.toJSON());
   }
 };

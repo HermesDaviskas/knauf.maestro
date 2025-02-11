@@ -1,14 +1,25 @@
 import { Router, Request, Response } from "express";
-import { signUpValidator, validationCheck } from "../middlewares/validators";
+import { signUpValidator } from "../middlewares/checkRequestValidation";
 import { UserCreatedResponse } from "../responses/UserCreatedResponse";
+
+//import { checkRequestValidness } from "../utilities/checkRequestValidness";
+import { checkRequestValidation } from "../middlewares/checkRequestValidation";
+import { checkUserExistence } from "../utilities/checkUserExistence";
+
+import { NotFoundError } from "../errors/NotFoundError";
+import { UserAlreadyExistsError } from "../errors/UserAlreadyExistsError";
 
 const router = Router();
 
 router.post(
   "/api/users/signup",
   signUpValidator,
-  validationCheck("auth", "signUpRouter", "Creating new user"),
-  (req: Request, res: Response) => {
+  checkRequestValidation,
+  async (req: Request, res: Response) => {
+    if (await checkUserExistence(req.body.username)) {
+      throw new UserAlreadyExistsError();
+    }
+
     new UserCreatedResponse(req, res).sendResponse();
   }
 );

@@ -6,7 +6,7 @@ export { CustomErrorArgs, CustomErrorJSON };
 export abstract class CustomError extends Error {
   abstract errorCode: number;
 
-  constructor(public customErrorArgs: CustomErrorArgs) {
+  constructor() {
     super();
     Object.setPrototypeOf(this, CustomError.prototype);
   }
