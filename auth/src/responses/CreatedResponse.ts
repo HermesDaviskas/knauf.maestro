@@ -57,6 +57,7 @@ export class CreatedResponse extends CustomResponse {
    * @async
    */
   async sendResponse() {
+    console.log(this.status, this.message, this.data);
     this.res.status(this.status[0]).send(this.toJSON());
   }
 }

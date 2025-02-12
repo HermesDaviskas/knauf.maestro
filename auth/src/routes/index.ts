@@ -16,6 +16,7 @@
  * @exports signInRouter        - Handles route related to user sign-in.
  * @exports signUpRouter        - Handles route related to user sign-up.
  * @exports signOutRouter       - Handles route related to user sign-out.
+ * @exports defaultRouter       - Handles catch-all route for handling unmatched requests.
  *
  */
 
@@ -24,6 +25,13 @@ import { currentUserRouter } from "./currentUserRouter";
 import { signInRouter } from "./signInRouter";
 import { signUpRouter } from "./signUpRouter";
 import { signOutRouter } from "./signOutRouter";
+import { defaultRouter } from "./defaultRouter";
 
 // Re-exporting the modules for easy access from a single point.
-export { currentUserRouter, signInRouter, signUpRouter, signOutRouter };
+export {
+  currentUserRouter,
+  signInRouter,
+  signUpRouter,
+  signOutRouter,
+  defaultRouter,
+};

@@ -25,23 +25,16 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof CustomError) {
-    // Log the custom error (structured logging recommended for production)
-    console.log(`Custom Error: ${err.message}`);
-
+    // Log the custom error
+    console.log(err.status, err.message);
     // Send the custom error response
     res.status(err.status[0]).send(err.toJSON());
   } else {
     // Handle unexpected errors with a generic internal server error
-    const internalServerError = new InternalServerError(err.message);
-
-    // Log the internal error (including the stack trace for debugging purposes)
-    console.log(`Generic Error: ${internalServerError.message}`, {
-      stack: internalServerError.stack,
-    });
-
+    const genericError = new InternalServerError(err.message);
+    // Log the generic error
+    console.log(genericError.status, genericError.message);
     // Send a generic error response
-    res
-      .status(internalServerError.status[0])
-      .send(internalServerError.toJSON());
+    res.status(genericError.status[0]).send(genericError.toJSON());
   }
 };
