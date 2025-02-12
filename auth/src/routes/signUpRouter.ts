@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
 import { checkRequestValidation, signUp } from "../middlewares/";
 import { checkDbConnection, checkUserAvailability } from "../middlewares/";
@@ -48,8 +49,14 @@ router.post(
       const user = User.build({ username, password });
       await user.save();
 
+      const { password: _, ...newUser } = user.toObject();
+
+      // Generate JWT and store it on session object
+      const userJwt = jwt.sign(newUser, "123");
+      req.session = { jwt: userJwt };
+
       // Create a response object to send back a success message and the created user data
-      const response = new CreatedResponse("user created", user, res);
+      const response = new CreatedResponse("user created", newUser, res);
       await response.sendResponse();
     } catch (err) {
       // If an error occurs, forward it to the global error handler

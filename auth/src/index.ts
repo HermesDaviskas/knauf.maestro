@@ -26,9 +26,10 @@
 
 import express from "express";
 import cors from "cors";
-import "express-async-errors";
 import { json } from "body-parser";
+import "express-async-errors";
 import mongoose from "mongoose";
+import cookieSession from "cookie-session";
 
 import {
   currentUserRouter,
@@ -46,6 +47,13 @@ const app = express();
 // Apply middleware
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(json()); // Enable JSON body parsing
+app.set("trust proxy", true); // Because traffic goes through NginX proxy
+app.use(
+  cookieSession({
+    signed: false, // Encryption: True -> Enabled, False -> Disabled
+    secure: true, // Use HTTPS: True -> Required, False -> Not required
+  })
+);
 
 // Register API routes
 app.use(currentUserRouter);
