@@ -1,10 +1,26 @@
+/**
+ * @file middlewares/checkRequestValidation.ts
+ *
+ * This file defines validation rules and a middleware function for validating incoming requests.
+ * It ensures that user input for sign-up and sign-in processes meets the required constraints.
+ *
+ * Usage Example:
+ *  - Applying validation in a route:
+ *    router.post("/api/users/signup", checkRequestValidation(signUp), async (req, res) => { ... });
+ *
+ * @exports signUp                 - Validation rules for user sign-up.
+ * @exports signIn                 - Validation rules for user sign-in.
+ * @exports checkRequestValidation - Middleware to enforce validation rules on requests.
+ */
+
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult, ValidationChain } from "express-validator";
 import { RequestValidationError } from "../errors";
 
 /**
- * Validator for sign-up data.
- * Ensures the username is at least 5 characters long and the password is at least 6 characters.
+ * Validation rules for user sign-up.
+ * - Username must be at least 5 characters long.
+ * - Password must be at least 6 characters long.
  */
 export const signUp: ValidationChain[] = [
   body("username")
@@ -18,27 +34,35 @@ export const signUp: ValidationChain[] = [
 ];
 
 /**
- * Validator for sign-in data.
- * Ensures username and password are provided.
+ * Validation rules for user sign-in.
+ * - Username is required.
+ * - Password is required.
  */
 export const signIn: ValidationChain[] = [
-  body("username").trim().notEmpty().withMessage("Username not provided"),
-  body("password").trim().notEmpty().withMessage("Password not provided"),
+  body("username").trim().notEmpty().withMessage("Username is required"),
+  body("password").trim().notEmpty().withMessage("Password is required"),
 ];
 
 /**
- * Middleware to validate request based on provided validator.
+ * Middleware to validate incoming requests based on the provided validation rules.
+ * If validation fails, it throws a `RequestValidationError`, which should be handled
+ * by an error-handling middleware.
+ *
+ * @param validators - An array of validation rules to apply.
+ * @returns Express middleware function enforcing validation.
  */
-export const validateRequest = (validator: ValidationChain[]) => {
+export const checkRequestValidation = (validators: ValidationChain[]) => {
   return [
-    ...validator,
+    ...validators,
     (req: Request, res: Response, next: NextFunction) => {
-      const validationErrors = validationResult(req);
+      const errors = validationResult(req);
 
-      if (!validationErrors.isEmpty())
-        throw new RequestValidationError(validationErrors.array());
+      // If validation errors exist, pass them to the error-handling middleware
+      if (!errors.isEmpty()) {
+        return next(new RequestValidationError(errors.array()));
+      }
 
-      next();
+      next(); // Proceed to the next middleware if validation passes
     },
   ];
 };

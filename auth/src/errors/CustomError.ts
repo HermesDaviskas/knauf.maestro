@@ -7,7 +7,7 @@ export type Message = { msg: string };
 export interface CustomErrorJSON {
   success: boolean;
   status: Status;
-  messages: Message[] | ValidationError[]; // List of reasons for the error
+  messages: Message[] | ValidationError[];
 }
 
 export abstract class CustomError extends Error {
