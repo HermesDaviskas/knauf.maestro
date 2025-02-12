@@ -25,16 +25,15 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof CustomError) {
-    // Log the custom error
+    // Log the custom error and send the custom error response
     console.log(err.status, err.message);
-    // Send the custom error response
     res.status(err.status[0]).send(err.toJSON());
   } else {
-    // Handle unexpected errors with a generic internal server error
+    // Create a generic internal server error to handle unexpected error
     const genericError = new InternalServerError(err.message);
-    // Log the generic error
+
+    // Log the generic error and send a generic error response
     console.log(genericError.status, genericError.message);
-    // Send a generic error response
     res.status(genericError.status[0]).send(genericError.toJSON());
   }
 };

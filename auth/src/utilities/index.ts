@@ -17,6 +17,7 @@
 
 // Importing individual utility functions
 import { isUsernameInDB } from "./isUsernameInDB";
+import { PasswordHashing } from "./PasswordHashing";
 
 // Re-exporting utility functions for centralized access
-export { isUsernameInDB };
+export { isUsernameInDB, PasswordHashing };

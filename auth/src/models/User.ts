@@ -1,20 +1,5 @@
-/**
- * @file models/User.ts
- *
- * This file defines the Mongoose schema and model for the `User` entity.
- * It provides type safety through TypeScript interfaces and includes a static
- * factory method (`build`) to enforce consistent object creation.
- *
- * Usage Example:
- *  - Creating a new user:
- *    const user = User.build({ username: "john_doe", password: "securePass123" });
- *    await user.save();
- *
- * @exports User       - The Mongoose model representing users.
- * @exports UserDoc    - Interface representing a User document in MongoDB.
- */
-
 import mongoose from "mongoose";
+import { PasswordHashing } from "../utilities"; // Utility for hashing passwords
 
 /**
  * Interface representing a User document in MongoDB.
@@ -56,11 +41,32 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Pre-save middleware for hashing the password before saving the user document.
+userSchema.pre("save", async function (done) {
+  try {
+    // Check if the password has been modified before hashing it
+    if (this.isModified("password")) {
+      // Hash the password using the PasswordHashing utility
+      const hashed = await PasswordHashing.toHash(this.get("password"));
+
+      // Set the hashed password to the document
+      this.set("password", hashed);
+    }
+    done();
+  } catch (err) {
+    return done(new Error(`userSchema.pre("save"): ${err}`));
+  }
+});
+
 /**
  * Adds a static `build` method to enforce type safety when creating new users.
  */
 userSchema.statics.build = (userBuildArgs: UserBuildArgs) => {
-  return new User(userBuildArgs);
+  try {
+    return new User(userBuildArgs);
+  } catch (err) {
+    throw new Error(`userSchema.statics.build(${userBuildArgs}): ${err}`);
+  }
 };
 
 // Create the Mongoose model with the defined schema and interfaces.

@@ -19,28 +19,26 @@ import { BadRequestError, InternalServerError } from "../errors";
  *
  * @returns Express middleware function that checks username availability.
  */
-export function checkUserAvailability() {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const { username } = req.body;
+export async function checkUserAvailability(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { username } = req.body;
 
-    try {
-      // Check if the username exists in the database
-      const usernameTaken = await isUsernameInDB(username);
+  try {
+    // Check if the username exists in the database
+    const usernameTaken: boolean = await isUsernameInDB(username);
 
-      if (usernameTaken) {
-        // If the username is taken, pass a BadRequestError to the next error handler
-        return next(
-          new BadRequestError(`Username ${username} already exists in DB`)
-        );
-      }
-
-      // Proceed to the next middleware if no errors
-      next();
-    } catch (err) {
-      // Pass an InternalServerError to the next error handler
-      return next(
-        new InternalServerError(`checkUserAvailability(${username}): ${err}`)
-      );
-    }
-  };
+    // If the username is taken, pass a BadRequestError to the next error handler
+    // else proceed to the next middleware
+    if (usernameTaken)
+      return next(new BadRequestError(`Username ${username} exists in DB`));
+    else next();
+  } catch (err) {
+    // If an error occurs in function, pass it to the next error handler
+    return next(
+      new InternalServerError(`checkUserAvailability(${username}): ${err}`)
+    );
+  }
 }

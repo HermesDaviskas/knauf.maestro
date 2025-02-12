@@ -33,8 +33,9 @@ import {
   checkRequestValidation,
   signUp,
   signIn,
-} from "./checkRequestValidation"; // Grouping all validation-related imports
-import { checkUserAvailability } from "./checkUserAvailability"; // User-specific middleware
+} from "./checkRequestValidation";
+import { checkUserAvailability } from "./checkUserAvailability";
+import { checkDbConnection } from "./checkDbConnection";
 import { errorHandler } from "./errorHandler"; // Global error handler
 
 // Exporting all middlewares and validations from this central file
@@ -42,6 +43,7 @@ export {
   checkRequestValidation,
   signUp,
   signIn,
+  checkDbConnection,
   checkUserAvailability,
   errorHandler,
 };

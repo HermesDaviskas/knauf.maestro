@@ -53,16 +53,18 @@ export const signIn: ValidationChain[] = [
  */
 export const checkRequestValidation = (validator: ValidationChain[]) => {
   return [
+    // Perform the selected validator checks
     ...validator,
+
+    // Then check if validation errors occured
     (req: Request, res: Response, next: NextFunction) => {
       const errors = validationResult(req);
 
-      // If validation errors exist, pass them to the error-handling middleware
-      if (!errors.isEmpty()) {
+      // If validation errors exist, pass them to the error-handling middleware,
+      // else proceed to the next middleware if validation passes
+      if (!errors.isEmpty())
         return next(new RequestValidationError(errors.array()));
-      }
-
-      next(); // Proceed to the next middleware if validation passes
+      else next();
     },
   ];
 };

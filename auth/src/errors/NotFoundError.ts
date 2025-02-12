@@ -17,6 +17,7 @@ import { CustomError, Status, CustomErrorJSON } from "./CustomError";
  * return res.status(error.status[0]).json(error.toJSON());
  *
  */
+
 export class NotFoundError extends CustomError {
   /**
    * Represents the HTTP status for this error.

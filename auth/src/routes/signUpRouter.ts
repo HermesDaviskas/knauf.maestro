@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 
 import { checkRequestValidation, signUp } from "../middlewares/";
-import { checkUserAvailability } from "../middlewares/";
+import { checkDbConnection, checkUserAvailability } from "../middlewares/";
 
 import { User } from "../models/User";
 import { CreatedResponse } from "../responses";
@@ -32,8 +32,11 @@ router.post(
   // Middleware to validate request data based on the sign-up validation rules
   checkRequestValidation(signUp),
 
+  // Middleware to check if connection to DB is established
+  checkDbConnection,
+
   // Middleware to check if the username is already taken
-  checkUserAvailability(),
+  checkUserAvailability,
 
   // Main route handler for user sign-up
   async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +53,7 @@ router.post(
       await response.sendResponse();
     } catch (err) {
       // If an error occurs, forward it to the global error handler
-      next(new Error(`Error while recording user in DB: ${err}`));
+      return next(new Error(`Error while recording user in DB: ${err}`));
     }
   }
 );
