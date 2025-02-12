@@ -48,12 +48,12 @@ export const signIn: ValidationChain[] = [
  * If validation fails, it throws a `RequestValidationError`, which should be handled
  * by an error-handling middleware.
  *
- * @param validators - An array of validation rules to apply.
+ * @param validator - An array of validation rules to apply.
  * @returns Express middleware function enforcing validation.
  */
-export const checkRequestValidation = (validators: ValidationChain[]) => {
+export const checkRequestValidation = (validator: ValidationChain[]) => {
   return [
-    ...validators,
+    ...validator,
     (req: Request, res: Response, next: NextFunction) => {
       const errors = validationResult(req);
 
