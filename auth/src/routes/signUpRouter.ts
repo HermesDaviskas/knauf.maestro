@@ -1,29 +1,30 @@
-import { Router, Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-
-import { checkRequestValidation, signUp } from "../middlewares/";
-import { checkDbConnection, checkUserAvailability } from "../middlewares/";
-
-import { User } from "../models/User";
-import { CreatedResponse } from "../responses";
-
 /**
- * @file routes/userRoutes.ts
+ * @file routes/signUpRouter.ts
  *
- * This file defines the route for user sign-up. It applies validation and
- * checks for the availability of the username before proceeding with the
- * user creation process. The route uses middleware to ensure proper data
- * validation and error handling before and after the main operation.
+ * This file defines the route for user sign-up. It validates the provided request data, checks if
+ * the username is already in use, and creates a new user if all conditions are met. The route utilizes
+ * middleware for request validation, database connection verification, and error handling.
  *
  * Usage Example:
- *  - When a POST request is made to `/api/users/signup`, the following sequence of operations occurs:
- *    1. Validate the sign-up data using the `checkRequestValidation` middleware.
- *    2. Check if the username is available using the `checkUserAvailability` middleware.
- *    3. If both steps pass, the user is created and a success response is sent.
- *    4. If an error occurs at any stage, it is handled by the global error handler.
+ *  - When a `POST` request is made to `/api/users/signup`, the following sequence of operations occurs:
+ *    1. **Validate sign-up data** using the `checkRequestValidation` middleware.
+ *    2. **Ensure the database connection** is established using `checkDbConnection`.
+ *    3. **Check if the username is already taken** using `isUsernameInDB`.
+ *    4. If the username is available, **create a new user** and save it to the database.
+ *    5. **Return a success response** with the newly created user data.
+ *    6. If any error occurs, it is passed to the global error handler.
  *
- * @exports User Sign-Up Route   - Handles user sign-up by validating request, checking username availability, and creating a new user.
+ * @exports signUpRouter - Handles user registration by validating request data, checking username availability, and creating a new user.
  */
+
+import { Router, Request, Response, NextFunction } from "express";
+
+import { checkRequestValidation, signUp } from "../middlewares/";
+import { checkDbConnection } from "../middlewares/";
+import { isUsernameInDB } from "../utilities/";
+import { User } from "../models/User";
+import { CreatedResponse } from "../responses";
+import { BadRequestError } from "../errors";
 
 const router = Router();
 
@@ -33,34 +34,35 @@ router.post(
   // Middleware to validate request data based on the sign-up validation rules
   checkRequestValidation(signUp),
 
-  // Middleware to check if connection to DB is established
+  // Middleware to ensure the database connection is established
   checkDbConnection,
-
-  // Middleware to check if the username is already taken
-  checkUserAvailability,
 
   // Main route handler for user sign-up
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Destructure username and password from the request body
-      const { username, password } = req.body;
+      const { username, password, isBanned } = req.body;
 
-      // Create a new user instance using the provided data and save to the database
-      const user = User.build({ username, password });
+      // Check if the username is already taken
+      if (await isUsernameInDB(username))
+        throw new BadRequestError("User already exists");
+
+      // Create a new user instance using the provided data and save it to the database
+      const user = User.build({ username, password, isBanned });
       await user.save();
 
-      const { password: _, ...newUser } = user.toObject();
-
-      // Generate JWT and store it on session object
-      const userJwt = jwt.sign(newUser, "123");
-      req.session = { jwt: userJwt };
-
       // Create a response object to send back a success message and the created user data
-      const response = new CreatedResponse("user created", newUser, res);
+      const response = new CreatedResponse("User created", user.toJSON(), res);
       await response.sendResponse();
     } catch (err) {
-      // If an error occurs, forward it to the global error handler
-      return next(new Error(`Error while recording user in DB: ${err}`));
+      // Handle specific errors by passing them to the global error handler
+      if (err instanceof BadRequestError)
+        return next(
+          new BadRequestError(`Error during user sign-up: ${err.message}`)
+        );
+      // Handle any unexpected errors
+      else
+        return next(new Error(`Unexpected error during user sign-up: ${err}`));
     }
   }
 );

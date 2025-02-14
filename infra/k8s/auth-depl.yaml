@@ -15,6 +15,12 @@ spec:
       containers:
         - name: knauf-maestro-auth-pod
           image: hermesdaviskas/knauf.maestro_auth
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: jwt_key
           ports:
             - containerPort: 3001
 ---

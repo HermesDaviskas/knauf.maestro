@@ -25,16 +25,18 @@
 
 // Importing custom error classes
 import { CustomError } from "./CustomError";
-import { BadRequestError } from "./BadRequestError";
-import { InternalServerError } from "./InternalServerError";
-import { NotFoundError } from "./NotFoundError";
 import { RequestValidationError } from "./RequestValidationError";
+import { BadRequestError } from "./BadRequestError";
+import { UnauthorizedError } from "./UnauthorizedError";
+import { NotFoundError } from "./NotFoundError";
+import { InternalServerError } from "./InternalServerError";
 
 // Exporting the custom error classes for easy access throughout the application
 export {
   CustomError, // The base class for all custom errors
-  BadRequestError, // Error for bad client request (400)
-  InternalServerError, // Error for server-side issues (500)
-  NotFoundError, // Error for missing resources (404)
   RequestValidationError, // Error for validation failures (400)
+  BadRequestError, // Error for bad client request (400)
+  UnauthorizedError, // Error for wrong credentials request (401)
+  NotFoundError, // Error for missing resources (404)
+  InternalServerError, // Error for server-side issues (500)
 };

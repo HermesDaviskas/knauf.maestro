@@ -45,13 +45,17 @@ import { errorHandler } from "./middlewares";
 const app = express();
 
 // Apply middleware
-app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(
+  cors({
+    credentials: true, // Allow sending credentials (cookies)
+  })
+);
 app.use(json()); // Enable JSON body parsing
 app.set("trust proxy", true); // Because traffic goes through NginX proxy
 app.use(
   cookieSession({
     signed: false, // Encryption: True -> Enabled, False -> Disabled
-    secure: true, // Use HTTPS: True -> Required, False -> Not required
+    secure: false, // Use HTTPS: True -> Required, False -> Not required
   })
 );
 
@@ -67,6 +71,8 @@ app.use(errorHandler);
 
 async function startServer() {
   try {
+    if (!process.env.JWT_KEY) throw new Error("JWT_KEY not defined");
+
     // Function to establish a connection to MongoDB
     await mongoose.connect("mongodb://auth-mongo-clusterip-srv:3011/auth");
     console.log("Connected to authentication database.");
@@ -77,8 +83,9 @@ async function startServer() {
       console.log("Listening on port 3001");
     });
   } catch (err) {
-    console.error("Cannot connect to the database.", err);
-    process.exit(1); // Exit the process if DB connection fails
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error("Error on starting application.", errorMessage);
+    process.exit(1);
   }
 }
 

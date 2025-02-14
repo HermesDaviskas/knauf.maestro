@@ -56,12 +56,12 @@ export const checkRequestValidation = (validator: ValidationChain[]) => {
     // Perform the selected validator checks
     ...validator,
 
-    // Then check if validation errors occured
     (req: Request, res: Response, next: NextFunction) => {
+      // Check if validation errors occured
       const errors = validationResult(req);
 
-      // If validation errors exist, pass them to the error-handling middleware,
-      // else proceed to the next middleware if validation passes
+      // If validation errors exist, call error-handling middleware,
+      // else proceed to the next middleware
       if (!errors.isEmpty())
         return next(new RequestValidationError(errors.array()));
       else next();

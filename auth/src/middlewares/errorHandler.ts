@@ -32,6 +32,8 @@ export const errorHandler = (
     // Create a generic internal server error to handle unexpected error
     const genericError = new InternalServerError(err.message);
 
+    console.log("gen", genericError);
+
     // Log the generic error and send a generic error response
     console.log(genericError.status, genericError.message);
     res.status(genericError.status[0]).send(genericError.toJSON());

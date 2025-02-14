@@ -24,7 +24,9 @@
  *
  * @exports checkRequestValidation  - Middleware for validating request data based on defined validation rules.
  * @exports signUp                  - Validation rules specific to the sign-up process.
- * @exports signIn                  - Validation rules specific to the sign-in process.
+ * @exports signUp                  - Validation rules specific to the sign-up process.
+ * @exports checkToken              - Checks if session token exists and if it is valid.
+ * @exports checkUserAccess         - Checks if session token exists and if it is valid.
  * @exports checkUserAvailability   - Middleware to check if the username already exists in the database.
  * @exports errorHandler            - Global error handler middleware for managing application errors.
  */
@@ -35,14 +37,18 @@ import {
   signIn,
 } from "./checkRequestValidation";
 import { checkUserAvailability } from "./checkUserAvailability";
+import { checkToken } from "./checkToken";
+import { checkUserAccess } from "./checkUserAccess";
 import { checkDbConnection } from "./checkDbConnection";
-import { errorHandler } from "./errorHandler"; // Global error handler
+import { errorHandler } from "./errorHandler";
 
 // Exporting all middlewares and validations from this central file
 export {
   checkRequestValidation,
   signUp,
   signIn,
+  checkToken,
+  checkUserAccess,
   checkDbConnection,
   checkUserAvailability,
   errorHandler,

@@ -1,37 +1,37 @@
 /**
- * @file responses/CreatedResponse.ts
+ * @file responses/OkResponse.ts
  *
- * This file defines the `CreatedResponse` class, a standardized response for successful resource creation.
+ * This file defines the `OkResponse` class, a standardized response for successful API requests.
  * It extends the `CustomResponse` abstract class and provides a structured JSON response format.
  *
  * Usage Example:
- *  - When a new resource is successfully created, return an instance of `CreatedResponse`:
- *    new CreatedResponse("User created", userData, res).sendResponse();
+ *  - When an operation completes successfully, return an instance of `OkResponse`:
+ *    new OkResponse("Operation successful", responseData, res).sendResponse();
  *
  * @typedef {Status} Status - A tuple representing the response status code and its description.
- * @typedef {CustomResponseJSON} CustomResponseJSON - The structured JSON format for API responses.
+ * @typedef {CustomResponseJSON} CustomResponseJSON - The standardized JSON format for API responses.
  *
- * @exports CreatedResponse - Represents a successful resource creation response.
+ * @exports OkResponse - Represents a successful response with a 200 status code.
  */
 
 import { CustomResponse, Status, CustomResponseJSON } from "./CustomResponse";
 import { Response } from "express";
 
 /**
- * Class representing a successful resource creation response.
- * Returns a 201 Created status with a standardized JSON format.
+ * Class representing a successful API response.
+ * Returns a 200 OK status with a structured JSON format.
  */
-export class CreatedResponse extends CustomResponse {
+export class OkResponse extends CustomResponse {
   /**
-   * Defines the HTTP status code and description for resource creation.
+   * Defines the HTTP status code and its description for a successful response.
    */
-  public status: Status = [201, "Created"];
+  public status: Status = [200, "OK"];
 
   /**
-   * Constructs a `CreatedResponse` instance.
+   * Constructs an `OkResponse` instance.
    *
    * @param {string} message - A descriptive message for the response.
-   * @param {any} data - The data associated with the created resource.
+   * @param {any} data - The data associated with the response.
    * @param {Response} res - The Express response object.
    */
   constructor(public message: string, public data: any, private res: Response) {
@@ -52,7 +52,7 @@ export class CreatedResponse extends CustomResponse {
   }
 
   /**
-   * Sends the response to the client with a 201 status code.
+   * Sends the response to the client with a 200 status code.
    *
    * @async
    */

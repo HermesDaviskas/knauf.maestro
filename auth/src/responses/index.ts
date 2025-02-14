@@ -16,11 +16,13 @@
  *    new CreatedResponse("User created", userData, res).sendResponse();
  *
  * @exports CustomResponse    - Abstract base class for all custom responses.
+ * @exports OkResponse        - Represents a generic response for successful operation (200 OK).
  * @exports CreatedResponse   - Represents a response for successful resource creation (201 Created).
  */
 
 import { CustomResponse } from "./CustomResponse";
+import { OkResponse } from "./OkResponse";
 import { CreatedResponse } from "./CreatedResponse";
 
 // Exporting response classes for easy access from a single entry point.
-export { CustomResponse, CreatedResponse };
+export { CustomResponse, OkResponse, CreatedResponse };
