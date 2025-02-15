@@ -28,6 +28,7 @@
  * @exports checkToken              - Checks if session token exists and if it is valid.
  * @exports checkUserAccess         - Checks if session token exists and if it is valid.
  * @exports checkUserAvailability   - Middleware to check if the username already exists in the database.
+ * @exports grandAuth               - Sets currentUser to request
  * @exports errorHandler            - Global error handler middleware for managing application errors.
  */
 
@@ -40,6 +41,8 @@ import { checkUserAvailability } from "./checkUserAvailability";
 import { checkToken } from "./checkToken";
 import { checkUserAccess } from "./checkUserAccess";
 import { checkDbConnection } from "./checkDbConnection";
+import { setCurrentUser } from "./setCurrentUser";
+import { checkAuth } from "./checkAuth";
 import { errorHandler } from "./errorHandler";
 
 // Exporting all middlewares and validations from this central file
@@ -51,5 +54,7 @@ export {
   checkUserAccess,
   checkDbConnection,
   checkUserAvailability,
+  setCurrentUser,
+  checkAuth,
   errorHandler,
 };

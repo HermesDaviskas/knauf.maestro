@@ -17,28 +17,18 @@
  */
 
 import { Router, Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import {
-  checkToken,
-  checkDbConnection,
-  checkUserAccess,
-} from "../middlewares/";
+import { setCurrentUser } from "../middlewares";
+import { checkAuth } from "../middlewares";
 import { OkResponse } from "../responses";
 
 const router = Router();
-var payload: JwtPayload = {};
 
 router.get(
   "/api/users/currentUser",
-  // Check if session token exist
-  checkToken,
-  // Middleware to ensure database connection is established
-  checkDbConnection,
-  // Check that user exists and he has access
-  checkUserAccess,
-  // If all checks passed, return the user payload
+  setCurrentUser,
+  checkAuth,
   async (req: Request, res: Response, next: NextFunction) => {
-    const response = new OkResponse("user is authorized", payload, res);
+    const response = new OkResponse("current user", req.currentUser, res);
     response.sendResponse();
   }
 );

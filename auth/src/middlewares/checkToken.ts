@@ -22,17 +22,15 @@ import { UnauthorizedError } from "../errors";
  */
 export function checkToken(req: Request, res: Response, next: NextFunction) {
   // Ensure session and JWT exist
-  if (!req.session || !req.session.jwt)
-    return new UnauthorizedError("No session token");
+  if (!req.session?.jwt) throw new UnauthorizedError("No session token");
 
   try {
     // Verify the JWT and decode the payload
     jwt.verify(req.session.jwt, process.env.JWT_KEY!) as JwtPayload;
-
     // Proceed to the next middleware or route handler
     next();
   } catch {
     // Handle invalid JWT case
-    return new UnauthorizedError("Invalid session token");
+    throw new UnauthorizedError("Invalid session token");
   }
 }
