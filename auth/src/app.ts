@@ -1,5 +1,5 @@
 /**
- * @file index.ts
+ * @file app.ts
  *
  * This file serves as the main entry point for the application.
  * It initializes the Express server, sets up middleware, connects to the database,
@@ -43,29 +43,36 @@ import { errorHandler } from "./middlewares";
 // Initialize Express application
 const app = express();
 
-// Apply middleware
+// Apply middleware for CORS (Cross-Origin Resource Sharing)
 app.use(
   cors({
-    credentials: true, // Allow sending credentials (cookies)
+    credentials: true, // Allow sending credentials (cookies) in CORS requests
   })
 );
-app.use(json()); // Enable JSON body parsing
-app.set("trust proxy", true); // Because traffic goes through NginX proxy
+
+// Apply middleware to parse JSON bodies in requests
+app.use(json());
+
+// Trust the proxy to handle reverse proxies like NginX
+app.set("trust proxy", true);
+
+// Apply middleware for session management
 app.use(
   cookieSession({
-    signed: false, // Encryption: True -> Enabled, False -> Disabled
-    secure: false, // Use HTTPS: True -> Required, False -> Not required
+    signed: false, // No encryption of session cookie
+    // secure: process.env.NODE_ENV !== "test", // Use HTTPS in non-test environments
+    secure: false,
   })
 );
 
-// Register API routes
-app.use(currentUserRouter);
-app.use(signInRouter);
-app.use(signUpRouter);
-app.use(signOutRouter);
-app.use(defaultRouter);
+// Register the route handlers for different parts of the API
+app.use(currentUserRouter); // Handles current user-related routes
+app.use(signInRouter); // Handles sign-in requests
+app.use(signUpRouter); // Handles sign-up requests
+app.use(signOutRouter); // Handles sign-out requests
+app.use(defaultRouter); // Handles any unmatched routes
 
-// Apply global error handler middleware
+// Register global error handler middleware to catch and process errors
 app.use(errorHandler);
 
 export { app };

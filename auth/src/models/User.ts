@@ -16,7 +16,7 @@ interface UserDoc extends mongoose.Document {
 interface UserBuildArgs {
   username: string;
   password: string;
-  isBanned: boolean;
+  isBanned?: boolean;
 }
 
 /**
@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     password: { type: String, required: true },
-    isBanned: { type: Boolean, required: true },
+    isBanned: { type: Boolean, default: false },
   },
   {
     toJSON: {
@@ -57,7 +57,7 @@ userSchema.pre("save", async function (done) {
  * Adds a static `build` method to enforce type safety when creating new users.
  */
 userSchema.statics.build = (userBuildArgs: UserBuildArgs) =>
-  new User(userBuildArgs);
+  new User({ ...userBuildArgs, isBanned: userBuildArgs.isBanned ?? false }); // ✅ Ensure default
 
 // Create the Mongoose model with the defined schema and interfaces.
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);

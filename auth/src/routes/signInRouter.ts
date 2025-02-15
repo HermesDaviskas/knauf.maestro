@@ -14,7 +14,7 @@
  *    4. **Verify the provided password** against the stored hash.
  *    5. **Generate a JWT token** and store it in the session.
  *    6. **Return a success response** with the authenticated user data.
- *    7. If any error occurs, it is passed to the global error handler.
+ *    7. If any error occurs, it is automatically passed to the global error handler.
  *
  * @exports signInRouter - Handles user authentication by verifying credentials and issuing a JWT token.
  */
@@ -62,14 +62,8 @@ router.post(
       const response = new OkResponse("User signed in", user.toJSON(), res);
       await response.sendResponse();
     } catch (err) {
-      // Pass specific errors to the global error handler
-      if (err instanceof BadRequestError || err instanceof UnauthorizedError)
-        return next(
-          new BadRequestError(`Error during user sign-in: ${err.message}`)
-        );
-      // Handle any unexpected errors
-      else
-        return next(new Error(`Unexpected error during user sign-in: ${err}`));
+      // Automatically pass the error to the global error handler
+      next(err);
     }
   }
 );

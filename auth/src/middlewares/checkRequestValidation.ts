@@ -26,11 +26,16 @@ export const signUp: ValidationChain[] = [
   body("username")
     .trim()
     .isLength({ min: 5 })
-    .withMessage("Username must be at least 5 characters long"),
+    .withMessage("username must be at least 5 characters long"),
   body("password")
     .trim()
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .withMessage("password must be at least 6 characters long"),
+  body("isBanned")
+    .trim()
+    .optional()
+    .isBoolean()
+    .withMessage("isBanned must be of boolean type"),
 ];
 
 /**

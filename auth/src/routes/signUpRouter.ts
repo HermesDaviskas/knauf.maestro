@@ -29,7 +29,7 @@ import { BadRequestError } from "../errors";
 const router = Router();
 
 router.post(
-  "/api/users/signup",
+  "/api/users/signUp",
 
   // Middleware to validate request data based on the sign-up validation rules
   checkRequestValidation(signUp),
@@ -55,14 +55,8 @@ router.post(
       const response = new CreatedResponse("User created", user.toJSON(), res);
       await response.sendResponse();
     } catch (err) {
-      // Handle specific errors by passing them to the global error handler
-      if (err instanceof BadRequestError)
-        return next(
-          new BadRequestError(`Error during user sign-up: ${err.message}`)
-        );
-      // Handle any unexpected errors
-      else
-        return next(new Error(`Unexpected error during user sign-up: ${err}`));
+      // Simply forward the error to the global error handler
+      return next(err);
     }
   }
 );
