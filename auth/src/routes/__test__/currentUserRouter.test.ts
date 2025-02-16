@@ -1,5 +1,5 @@
 /**
- * @file __tests__/currentUser.test.ts
+ * @file __tests__/currentUserRouter.test.ts
  *
  * This file contains test cases for the "currentUser" API, which provides information about the currently authenticated user.
  * It verifies the expected behavior under different scenarios, ensuring that valid requests return the correct user data and invalid requests return appropriate error responses.
