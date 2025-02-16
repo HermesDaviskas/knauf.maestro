@@ -2,90 +2,119 @@
  * @file __tests__/signOutRouter.test.ts
  *
  * This file contains test cases for the user sign-out API.
- * It verifies the expected behavior of the sign-out endpoint under different scenarios,
- * ensuring that valid requests succeed and invalid requests fail with appropriate responses.
+ * It verifies expected behaviors such as session invalidation and handling unauthenticated requests.
  *
  * Test Cases:
- *  - **Successful Sign-out**: Ensures users can sign out and the session is cleared.
- *  - **Not Authenticated**: Verifies that trying to sign out without being authenticated returns a 401 error.
- *  - **Session Cleared After Sign-out**: Verifies that once a user signs out, they cannot sign out again without re-authenticating.
+ *  - ✅ Successful Sign-out: Ensures users can sign out and the session is cleared.
+ *  - ✅ Not Authenticated: Verifies that signing out without authentication returns a 401 error.
+ *  - ✅ Session Cleared After Sign-out: Ensures users cannot sign out again after an initial sign-out.
  *
  * Usage:
  *  - Uses `supertest` to send HTTP requests to the sign-out endpoint.
- *  - Defines helper functions `signUp`, `signIn`, and `signOut` to reduce code duplication and improve readability.
+ *  - Provides helper functions (`signUp`, `signIn`, `signOut`) for improved readability and reusability.
  */
 
 import request from "supertest";
 import { app } from "../../app";
 
-// Declare a variable to hold the session cookie
-let cookie: string[] = [];
+// Helper functions for user authentication actions
+const signUp = (data: object, expectedStatus: number) => request(app).post("/api/users/signUp").send(data).expect(expectedStatus);
 
-// Helper function to sign up a user and check for the expected status code
-// This sends a POST request to sign up and checks the expected status code in the response
-const signUp = (data: object, expectedStatus: number) =>
-  request(app).post("/api/users/signUp").send(data).expect(expectedStatus);
-
-// Helper function to sign in a user and check for the expected status code
-// This sends a POST request to sign in, stores the session cookie in the `cookie` variable, and checks the expected status code
 const signIn = async (data: object, expectedStatus: number) => {
-  const response = await request(app)
-    .post("/api/users/signIn")
-    .send(data)
-    .expect(expectedStatus);
-  cookie = response.get("Set-Cookie"); // Store the cookie from the response
+  const response = await request(app).post("/api/users/signIn").send(data).expect(expectedStatus);
+  return response.get("Set-Cookie");
 };
 
-// Helper function to sign out a user and check for the expected status code
-// This sends a POST request to sign out, passing the current session cookie, and checks the expected status code
-const signOut = async (expectedStatus: number) => {
-  const response = await request(app)
-    .post("/api/users/signOut")
-    .set("Cookie", cookie) // Send the current session cookie
-    .expect(expectedStatus);
-  cookie = response.get("Set-Cookie"); // Store the updated cookie from the response
+const signOut = async (cookie: string[] | undefined, expectedStatus: number) => {
+  const requestBuilder = request(app).post("/api/users/signOut");
+  if (cookie) requestBuilder.set("Cookie", cookie);
+
+  const response = await requestBuilder.expect(expectedStatus);
+  return response.get("Set-Cookie");
 };
 
-it("returns 200 on successful sign-out", async () => {
-  // First, sign up a new user
-  await signUp({ username: "ermis", password: "123456" }, 201);
+describe("User Sign-Out API", () => {
+  /**
+   * ✅ Test Case: Successful Sign-out
+   *
+   * This test verifies that a user can successfully sign out.
+   * Expected Behavior:
+   *  - User signs up and logs in.
+   *  - A valid session cookie is returned.
+   *  - User signs out, and the response returns a 200 status.
+   */
+  it("returns 200 on successful sign-out", async () => {
+    // Step 1: Sign up a new user
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Sign in to authenticate the user
-  await signIn({ username: "ermis", password: "123456" }, 200);
+    // Step 2: Sign in to get a session cookie
+    const cookie = await signIn({ username: "ermis", password: "123456" }, 200);
 
-  // Attempt to sign out (should succeed and return status 200)
-  await signOut(200);
+    // Step 3: Sign out the user and expect a 200 response
+    await signOut(cookie, 200);
+  });
 
-  // Ensure the cookie is cleared or invalidated after sign-out
-  expect(cookie.length).toBe(1); // Ensure that a cookie is returned (even if it's expired)
+  /**
+   * ✅ Test Case: Session Invalidation After Sign-out
+   *
+   * This test verifies that after a successful sign-out, the session cookie is invalidated.
+   * Expected Behavior:
+   *  - User signs up, logs in, and gets a session cookie.
+   *  - User signs out.
+   *  - The returned cookie should have an expiration date set in the past.
+   */
+  it("invalidates the session cookie after signing out", async () => {
+    // Step 1: Sign up and sign in to get a valid session cookie
+    await signUp({ username: "ermis", password: "123456" }, 201);
+    const cookie = await signIn({ username: "ermis", password: "123456" }, 200);
 
-  // Check that the cookie has an expired date or is invalidated
-  const cookieHeader = cookie[0]; // Get the cookie header
-  expect(cookieHeader).toContain("expires=Thu, 01 Jan 1970 00:00:00 GMT"); // Check if the cookie is expired
-});
+    // Step 2: Sign out and retrieve the returned (invalidated) cookie
+    const expiredCookie = await signOut(cookie, 200);
 
-it("returns 401 if not authenticated", async () => {
-  // Attempt to sign out without being authenticated (should fail with status 401)
-  await signOut(401);
-});
+    // Step 3: Ensure that a cookie is still returned (even if expired)
+    expect(expiredCookie).toBeDefined();
+    expect(expiredCookie.length).toBeGreaterThan(0);
 
-it("returns 200 after user signs out and session is cleared", async () => {
-  // First, sign up a new user
-  await signUp({ username: "ermis", password: "123456" }, 201);
+    // Step 4: Verify that the cookie is marked as expired
+    const cookieHeader = expiredCookie[0];
+    expect(cookieHeader).toContain("expires=Thu, 01 Jan 1970 00:00:00 GMT");
+  });
 
-  // Sign in to authenticate the user
-  await signIn({ username: "ermis", password: "123456" }, 200);
+  /**
+   * ✅ Test Case: Unauthorized Sign-out Attempt
+   *
+   * This test checks that attempting to sign out without an active session
+   * results in a 401 Unauthorized response.
+   * Expected Behavior:
+   *  - No authentication is performed.
+   *  - User attempts to sign out.
+   *  - API should respond with 401 Unauthorized.
+   */
+  it("returns 401 if user is not authenticated", async () => {
+    // Step 1: Try to sign out without logging in
+    await signOut(undefined, 401);
+  });
 
-  // Sign out the user (should succeed)
-  await signOut(200);
+  /**
+   * ✅ Test Case: Session Cleared After Sign-out
+   *
+   * This test ensures that after signing out, the session is fully cleared.
+   * Expected Behavior:
+   *  - User signs up, logs in, and gets a session cookie.
+   *  - User signs out.
+   *  - Attempting to sign out again without re-authenticating should return 401 Unauthorized.
+   */
+  it("ensures session is cleared after sign-out", async () => {
+    // Step 1: Sign up a new user
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Ensure the cookie is cleared or invalidated after sign-out
-  expect(cookie.length).toBe(1); // Ensure that a cookie is returned (even if it's expired)
+    // Step 2: Sign in and obtain a session cookie
+    const cookie = await signIn({ username: "ermis", password: "123456" }, 200);
 
-  // Check that the cookie has an expired date or is invalidated
-  const cookieHeader = cookie[0]; // Get the cookie header
-  expect(cookieHeader).toContain("expires=Thu, 01 Jan 1970 00:00:00 GMT"); // Check if the cookie is expired
+    // Step 3: Sign out successfully
+    const expiredCookie = await signOut(cookie, 200);
 
-  // Attempt to sign out again without an active session (should fail with status 401)
-  await signOut(401);
+    // Step 4: Try to sign out again using the expired cookie (should fail with 401)
+    await signOut(expiredCookie, 401);
+  });
 });

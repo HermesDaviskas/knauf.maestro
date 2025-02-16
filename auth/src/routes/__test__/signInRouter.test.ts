@@ -20,53 +20,93 @@
 import request from "supertest";
 import { app } from "../../app";
 
-// Helper function to sign in a user and check for the expected status code
-const signIn = (data: object, expectedStatus: number) =>
-  request(app).post("/api/users/signIn").send(data).expect(expectedStatus);
+// Helper functions for user authentication actions
+const signUp = (data: object, expectedStatus: number) => request(app).post("/api/users/signUp").send(data).expect(expectedStatus);
 
-// Helper function to sign up a user and check for the expected status code
-const signUp = (data: object, expectedStatus: number) =>
-  request(app).post("/api/users/signUp").send(data).expect(expectedStatus);
+const signIn = async (data: object, expectedStatus: number) => {
+  const response = await request(app).post("/api/users/signIn").send(data).expect(expectedStatus);
+  return response.get("Set-Cookie");
+};
 
-it("returns 200 on successful signup", async () => {
-  // First, sign up a new user
-  await signUp({ username: "ermis", password: "123456" }, 201);
+describe("User Sign-In API", () => {
+  /**
+   * ✅ Test Case: Successful Sign-in
+   *
+   * This test verifies that a user can sign in with valid credentials.
+   * Expected Behavior:
+   *  - User signs up and provides correct credentials.
+   *  - Sign-in should succeed with status 200.
+   */
+  it("returns 200 on successful signup", async () => {
+    // Step 1: Sign up a new user
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Attempt to sign in with correct credentials (should succeed)
-  await signIn({ username: "ermis", password: "123456" }, 200);
-});
+    // Step 2: Attempt to sign in with correct credentials (should succeed)
+    await signIn({ username: "ermis", password: "123456" }, 200);
+  });
 
-it("returns 400 on invalid request", async () => {
-  // Sign up a valid user first
-  await signUp({ username: "ermis", password: "123456" }, 201);
+  /**
+   * ✅ Test Case: Cookie Setting After Successful Sign-in
+   *
+   * This test ensures that a cookie is set after a successful sign-in.
+   * Expected Behavior:
+   *  - After a successful sign-in, a 'Set-Cookie' header is returned.
+   */
+  it("sets a cookie after successful sign in", async () => {
+    // Step 1: Sign up a new user
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Test various invalid requests with missing or empty fields
-  await signIn({ password: "123456" }, 400); // Missing username
-  await signIn({ username: "", password: "123456" }, 400); // Empty username
-  await signIn({ username: "ermis" }, 400); // Missing password
-  await signIn({ username: "ermis", password: "" }, 400); // Empty password
-});
+    // Step 2: Attempt to sign in with correct credentials (should succeed)
+    const cookie = await signIn({ username: "ermis", password: "123456" }, 200);
 
-it("returns 400 if username does not exist", async () => {
-  // Attempt to sign in with a non-existent username (should return 400 error)
-  await signIn({ username: "noUsername", password: "123456" }, 400);
-});
+    // Step 3: Verify that the 'Set-Cookie' header is present in the response
+    expect(cookie).toBeDefined();
+  });
 
-it("returns 401 for wrong credentials", async () => {
-  // First, sign up a valid user
-  await signUp({ username: "ermis", password: "123456" }, 201);
+  /**
+   * ✅ Test Case: Invalid Requests with Missing or Empty Fields
+   *
+   * This test verifies that invalid sign-in requests (such as missing or empty fields)
+   * return a 400 error.
+   * Expected Behavior:
+   *  - Missing or empty fields in the request body should result in a 400 error.
+   */
+  it("returns 400 on invalid request", async () => {
+    // Step 1: Sign up a valid user first
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Attempt to sign in with an incorrect password (should fail with 401 error)
-  await signIn({ username: "ermis", password: "1234568" }, 401);
-});
+    // Step 2: Test various invalid requests with missing or empty fields
+    await signIn({ password: "123456" }, 400); // Missing username
+    await signIn({ username: "", password: "123456" }, 400); // Empty username
+    await signIn({ username: "ermis" }, 400); // Missing password
+    await signIn({ username: "ermis", password: "" }, 400); // Empty password
+  });
 
-it("sets a cookie after successful sign in", async () => {
-  // First, sign up a new user
-  await signUp({ username: "ermis", password: "123456" }, 201);
+  /**
+   * ✅ Test Case: Sign-In Attempt with Non-Existent Username
+   *
+   * This test checks that attempting to sign in with a non-registered username
+   * results in a 400 error.
+   * Expected Behavior:
+   *  - Sign-in with a non-existent username should return a 400 error.
+   */
+  it("returns 400 if username does not exist", async () => {
+    // Step 1: Attempt to sign in with a non-existent username
+    await signIn({ username: "noUsername", password: "123456" }, 400);
+  });
 
-  // Attempt to sign in with correct credentials (should succeed)
-  const response = await signIn({ username: "ermis", password: "123456" }, 200);
+  /**
+   * ✅ Test Case: Wrong Credentials Handling
+   *
+   * This test ensures that an incorrect password results in a 401 error.
+   * Expected Behavior:
+   *  - Incorrect credentials should return a 401 Unauthorized error.
+   */
+  it("returns 401 for wrong credentials", async () => {
+    // Step 1: Sign up a valid user
+    await signUp({ username: "ermis", password: "123456" }, 201);
 
-  // Verify that the 'Set-Cookie' header is present in the response
-  expect(response.get("Set-Cookie")).toBeDefined();
+    // Step 2: Attempt to sign in with an incorrect password (should fail with 401 error)
+    await signIn({ username: "ermis", password: "1234568" }, 401);
+  });
 });
