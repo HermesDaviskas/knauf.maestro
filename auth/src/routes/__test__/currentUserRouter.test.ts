@@ -1,5 +1,5 @@
 /**
- * @file __tests__/currentUserRouter.test.ts
+ * @file routes/__tests__/currentUserRouter.test.ts
  *
  * This file contains test cases for the "currentUser" API, which provides information about the currently authenticated user.
  * It verifies the expected behavior under different scenarios, ensuring that valid requests return the correct user data and invalid requests return appropriate error responses.
@@ -62,7 +62,7 @@ describe("Current User API", () => {
     const response = await currentUser(cookie, 200);
 
     // Step 4: Verify that the response contains the correct user data
-    expect(response.body.username).toBe("ermis");
+    expect(response.body.messages[0].data.username).toBe("ermis");
   });
 
   /**

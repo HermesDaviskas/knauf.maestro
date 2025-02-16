@@ -1,5 +1,5 @@
 /**
- * @file __tests__/signInRouter.test.ts
+ * @file routes/__tests__/signInRouter.test.ts
  *
  * This file contains test cases for the user sign-in API.
  * It verifies the expected behavior of the sign-in endpoint under different scenarios,

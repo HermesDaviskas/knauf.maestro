@@ -1,5 +1,5 @@
 /**
- * @file __tests__/signUpRouter.test.ts
+ * @file routes/__tests__/signUpRouter.test.ts
  *
  * This file contains test cases for the user signup API.
  * It verifies the expected behavior of the signup endpoint under different scenarios,

@@ -1,5 +1,5 @@
 /**
- * @file __tests__/signOutRouter.test.ts
+ * @file routes/__tests__/signOutRouter.test.ts
  *
  * This file contains test cases for the user sign-out API.
  * It verifies expected behaviors such as session invalidation and handling unauthenticated requests.
